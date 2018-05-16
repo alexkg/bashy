@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+if has run; then run
+elif has npm; then npm run
+elif has yarn; then yarn run server
+fi

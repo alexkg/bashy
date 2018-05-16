@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+test -d "./bin" && test -f "./bin/run"

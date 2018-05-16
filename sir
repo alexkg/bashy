@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+sudo subl --project /usr/local/etc/nginx/*.sublime-project

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+that="crushing-${this}"
+mv "${this}" "${that}"
+pngcrush -brute "${that}" "${this}"
+rm "${that}"

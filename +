@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if has yarn; then
+	yarn add "$@"
+elif has npm; then
+	npm install --save "$@"
+else
+	exit_because "Unrecognized project!"
+fi

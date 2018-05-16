@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+function e0 {
+	e1 .
+}
+
+function e1 {
+	if   [ -f "$@" ]; then e1f "$@"
+	elif [ -d "$@" ]; then e1d "$@"
+	fi
+}
+
+function e1f {
+	subl -n "$@"
+}
+
+function e1d {
+	folder="$@"
+	if [ -n "${folder}"/*.sublime-project ]; then
+		subl --project "${folder}"/*.sublime-project
+	else
+		subl "${folder}"/
+	fi
+}
+
+function eN {
+	for arg in "$@"; do e1 $arg; done
+}
+
+if   [ $# -eq 0 ]; then e0 "$@"
+elif [ $# -eq 1 ]; then e1 "$@"
+else                    eN "$@"
+fi

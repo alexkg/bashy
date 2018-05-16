@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [ $# -eq 0 ]; then what_path "${PWD}"; exit 0; fi
+
+FILE_NAME="$(basename $1)"
+FOLDER_NAME="$(dirname $1)"
+
+pushd . > /dev/null
+cd "$FOLDER_NAME"
+FOLDER_NAME="$(pwd)"
+popd > /dev/null
+
+FOLDER_NAME=$(echo $FOLDER_NAME | sed -e "s|^$PWD|.|")
+FOLDER_NAME=$(echo $FOLDER_NAME | sed -e "s|^$HOME|~|")
+
+echo "$FOLDER_NAME/$FILE_NAME"

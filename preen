@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+ext="$1"; shift
+
+if [ 0 -lt $# ] && [ -d "$*" ]
+	then find "$*" -name "*.${ext}" -type f | lived
+else
+	while read origin_ext
+	do
+		origin_ext=$(echo $origin_ext | sed 's|//*|/|g')
+		origin_dir=$(dirname "$origin_ext"); name=$(basename "$origin_ext" .${ext})
+		origin_dirt=$(ls -1t "$origin_dir"/*.${ext} | head -n 1)
+
+		curr_timestamp=$(stat -f "%m" "$origin_ext")
+		curr_timestomp=$(date -j -f "%s" "$curr_timestamp" +"%Y%m%d%H%M.%S")
+		
+		next_timestamp=$((curr_timestamp+1))
+		next_timestomp=$(date -j -f "%s" "$next_timestamp" +"%Y%m%d%H%M.%S")
+
+		touch -mt "$next_timestomp" "$origin_dir/$name".*
+		touch -mt "$curr_timestomp" "$origin_dir/$name".${ext}
+
+		if [ "$origin_ext" = "$origin_dirt" ]; then
+			touch -mt "$curr_timestomp" "$origin_dir"
+		fi
+	done
+fi

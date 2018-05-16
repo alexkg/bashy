@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# TODO: try to resolve `subliminal` in environment or by search...
+
+# thing=$(resolve-folder ${SUBLIME_APP} ~/Applications/Sublime\ Text.app /Applications/Sublime\ Text.app)
+
+# function glob {
+# 	find ~/Applications -type d -name "Sublime\ Text.app"
+# 	find  /Applications -type d -name "Sublime\ Text.app"
+# }
+
+# subliminal=$(glob | head -n1)
+subliminal="/Applications/Sublime Text.app" 
+subliminal_packages="${subliminal}/Contents/MacOS/Packages"
+subliminal_package="${subliminal_packages}/$@.sublime-package"
+
+function exit_echo {
+	code=$1; shift
+	echo $@
+	exit $code
+}
+
+[ ! -d "${subliminal}"               ] && exit_echo 1 "Can't find: Sublime Text.app!"
+[ ! -d "${subliminal_package}.unzip" ] && exit_echo 1 "Can't find folder: ${subliminal_package}.unzip"
+
+if [ -f "${subliminal_package}" ]; then
+	[ ! -f "${subliminal_package}.original.zip"   ] && cp        "${subliminal_package}"    "${subliminal_package}.original.zip"
+	[ ! -d "${subliminal_package}.original.unzip" ] && unzip -qq "${subliminal_package}" -d "${subliminal_package}.original.unzip"
+	rm "${subliminal_package}"
+fi
+
+cd "${subliminal_package}.unzip"
+zip -qq -r "${subliminal_package}" *

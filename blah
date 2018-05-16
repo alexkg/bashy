@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+# Maybe prompt would actually be better...
+# > password --count 4 --words /usr/share/dict/words --hash md5 "goo brain"
+
+# Constants ####################################################################
+
+word_src="/usr/local/share/dict/words.common.txt"
+word_tmp="$(mktemp)"
+
+word_count=
+char_count=
+
+default_word_count="5"
+default_char_count="3,"
+
+# Arguments ####################################################################
+
+while [[ $# -gt 0 ]]; do
+	case $* in
+		[0-9]*)
+			if [ -z ${word_count} ]; then word_count=$1; else char_count=$1; fi
+			shift
+			;;
+		-w|--word|--words)
+			shift; word_count=$1; shift
+			;;
+		-c|--char|--chars|--characters)
+			shift; char_count=$1; shift
+			;;
+		*)
+			shift
+			;;
+	esac
+done
+
+if [ -z ${word_count} ]; then word_count=${default_word_count}; fi
+if [ -z ${char_count} ]; then char_count=${default_char_count}; fi
+
+grep -xe "[a-z]\{${char_count}\}" "${word_src}" > "${word_tmp}"
+word_limit=$(wc "${word_tmp}" | awk '{print $1}')
+
+###
+
+function hash_for {
+	md5 -rs "$@" | awk '{print $1}'
+}
+
+function decimal_for {
+	echo $(( 16#$@ ))
+}
+
+function random_28bit_number_for {
+	decimal_for $(hash_for "$@" | cut -c 1-7)
+}
+
+function random_word_for {
+	word_index=$(( $(random_28bit_number_for "$@") % ${word_limit} ))
+	sed "${word_index}q;d" "${word_tmp}"
+}
+
+function random_word_for {
+	for i in $(seq $word_count); do random_word_for "$i $@"; done
+}
+
+function random_sentence_for {
+	random_word_for "$@" | xargs echo
+}
+
+###
+
+function random_30bit_number {
+	echo "$(( ((${RANDOM} << 15) | ${RANDOM}) ))"
+}
+
+function random_word {
+	word_index=$(( $(random_30bit_number) % ${word_limit} ))
+	sed "${word_index}q;d" "${word_tmp}"
+}
+
+function random_words {
+	for i in $(seq $word_count); do random_word; done
+}
+
+function random_sentence {
+	random_words | xargs echo
+}
+
+###
+
+[ $# == 0 ] && random_sentence || random_sentence_for "$@"

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+firefox_name="FirefoxDeveloperEdition"
+firefox_path="/Applications/${firefox_name}.app"
+
+open -a "$firefox_path" "$@"

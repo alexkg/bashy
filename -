@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if has yarn; then
+	yarn remove "$@"
+elif has npm; then
+	npm uninstall --save "$@"
+else
+	exit_because "Unrecognized project!"
+fi

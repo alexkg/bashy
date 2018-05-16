@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+exit_because "Not yet implemented!"

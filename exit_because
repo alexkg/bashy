@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+status=1
+
+if [[ "$1" =~ ^[0-9]+$ ]]; then
+	status=$1
+	shift
+fi
+
+exit_echo $status "$@"

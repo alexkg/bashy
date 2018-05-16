@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+status=$1
+shift
+reason="$@"
+
+if [ $status -gt 0 ]; then
+	echo "$reason" >&2
+else
+	echo "$reason"
+fi
+
+exit $status

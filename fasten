@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+function with {
+	ps x -o $1,command | grep -i $2 | grep -v grep | awk '{ print $1 }'
+}
+
+code="$1"
+shift
+name="$@"
+path=".app/Contents/MacOS/$@"
+
+echo "${name}: $(with nice ${path}) $(with pid ${path} | xargs sudo renice ${code} -p | echo "->") $(with nice ${path})"

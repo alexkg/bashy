@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# set - $1 # fish seems to be handing arguments in as a clump, so this spreads them out...
+
+COMMAND_NAME="$1"; shift
+COMMAND_FILE=$(which $COMMAND_NAME)
+
+if [ -n "$COMMAND_FILE" ]; then COMMAND_NAME="$(what path "$COMMAND_FILE")"; fi
+
+echo "$COMMAND_NAME $*"

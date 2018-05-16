@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set - $1
+set - $1
+
+echo $@

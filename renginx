@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+sudo nginx -s stop
+sleep 1
+sudo nginx

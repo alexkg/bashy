@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+arguments=$(enumerate_arguments "$@")
+set -e --
+
+_return_count=0
+_indent_count=0
+_indentation=""
+_indent=$'\t'
+
+for argument in $arguments; do
+	case $argument in
+		-n) _return_count=$((_return_count+1));;
+		-t) _indent_count=$((_indent_count+1));;
+		 *) set -- "$@" "$argument"
+	esac
+done
+
+_this_pathname="$1"
+_that_pathname="$1"
+
+function _resolve_glob {
+	find $(dirname "$_that_pathname") -name "$(basename "$_that_pathname").*"
+}
+
+function _resolve_path {
+	[ -f "$_that_pathname" ] && return
+	[ -d "$_that_pathname" ] && _that_pathname="$_that_pathname/index"
+	case $(_resolve_glob | wc -l | awk '{ print $1 }') in
+		0) exit_because 1 "No resolution for \`$_this_pathname\`, tried \`$_that_pathname.*\`";;
+		1) _that_pathname=$(_resolve_glob | xargs);;
+		*) exit_because 1 "Ambigous resolution for \`$_this_pathname\`, tried \`$_that_pathname.*\`";;
+	esac
+}
+
+# should only use the extension of the given file...
+
+_resolve_path
+
+_that_foldname=$(dirname  "$_that_pathname")
+_that_filename=$(basename "$_that_pathname")
+_this_basename=$(basename "$_that_pathname")
+_temp_basename=
+
+while [ "$_this_basename" != "$_temp_basename" ]; do
+	_temp_basename="${_this_basename}"
+	_this_basename="${_temp_basename%.*}"
+done
+
+_this_extn=${_that_filename#$_this_basename}
+
+[ -z "$this_file_extension" ] && this_file_extension="$_this_basename"
+[ -z "$this_file_basename"  ] && this_file_basename="$_this_basename"
+[ -z "$this_file_name"      ] && this_file_name="$_this_basename"
+[ -z "$this_name"           ] && this_name="$_this_basename"
+[ -z "$this"                ] && this="$_this_basename"
+
+if [ $_indent_count -gt 0 ]; then
+	for i in $(seq 1 $_indent_count); do
+		_indentation="$_indentation$_indent"
+	done
+fi
+
+if [ $_return_count -gt 0 ]; then
+	for i in $(seq 1 $_return_count); do
+		echo
+	done
+fi
+
+cd "$_that_foldname" > /dev/null 2>&1 # Not sure why `cd` is printing stuff, maybe a `fish` hook?
+
+_temp_filename=$(mktemp)
+
+this=$this eval "cat <<EOF
+$(cat $_that_filename | sed 's|\([`$]\)|\\\1|g' | sed 's|\\\([$][{(]\)|\1|g')
+EOF" 2> /dev/null > $_temp_filename
+
+head    -1 $_temp_filename
+tail -n +2 $_temp_filename | sed "s|^|${_indentation}|"
+
+rm $_temp_filename 2> /dev/null

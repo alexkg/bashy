@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+ext=js; if [ $# -gt 0 ]; ext=$1; fi
+
+find $argv -name "*.${ext}" | xargs cat | grep -E "\w" | wc -l

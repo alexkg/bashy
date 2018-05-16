@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+date -v0S -v0M -v0H -v-7d
