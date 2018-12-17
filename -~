@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 if has yarn; then
-	yarn remove -D "$@"
+	yarn remove "${@}"
+#	yarn remove -D "${@}"
 elif has npm; then
 	npm uninstall --save-dev "$@"
 else

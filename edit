@@ -1,33 +1,59 @@
 #!/usr/bin/env bash
 
-function e0 {
-	e1 .
+function eval~ {
+	while read rest; do eval "${@} ${rest}"; done
 }
 
-function e1 {
-	if   [ -f "$@" ]; then e1f "$@"
-	elif [ -d "$@" ]; then e1d "$@"
+function open_folder {
+	subl "${@}"/
+}
+function open_folder~ {
+	eval~ open_folder
+}
+function open_project {
+	subl --project "${@}"
+}
+function open_project~ {
+	eval~ open_project
+}
+
+function list_all_projects_in {
+	find "${@}" -depth 1 -name "*.sublime-project"
+}
+function open_all_projects_in {
+	list_all_projects_in "${@}" | open_project~
+}
+function count_all_projects_in {
+	list_all_projects_in "${@}" | count~
+}
+
+
+
+function edit_this {
+	edit_that .
+}
+
+function edit_that {
+	if   [ -f "${@}" ]; then edit_file "${@}"
+	elif [ -d "${@}" ]; then edit_folder "${@}"
 	fi
 }
 
-function e1f {
-	subl -n "$@"
+function edit_file {
+	subl -n "${@}"
 }
 
-function e1d {
-	folder="$@"
-	if [ -n "${folder}"/*.sublime-project ]; then
-		subl --project "${folder}"/*.sublime-project
-	else
-		subl "${folder}"/
-	fi
+function edit_folder {
+	[ 0 -eq $(count_all_projects_in "${@}") ] \
+	&&	open_folder "${@}"                     \
+	||	open_all_projects_in "${@}"
 }
 
 function eN {
-	for arg in "$@"; do e1 $arg; done
+	for arg in "${@}"; do edit_that $arg; done
 }
 
-if   [ $# -eq 0 ]; then e0 "$@"
-elif [ $# -eq 1 ]; then e1 "$@"
-else                    eN "$@"
+if   [ ${#} -eq 0 ]; then edit_this "${@}"
+elif [ ${#} -eq 1 ]; then edit_that "${@}"
+else                      eN "${@}"
 fi

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 if has yarn; then
-	echo yarn add -D "$@"
+	yarn add -D "$@"
 elif has npm; then
-	echo npm install --save-dev "$@"
+	npm install --save-dev "$@"
 else
 	exit_because "Unrecognized project!"
 fi

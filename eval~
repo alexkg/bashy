@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+while read rest; do eval "${@} ${rest}"; done

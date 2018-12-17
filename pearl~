@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+function pearl~ {
+	[[ 0 -eq $# ]] && echo~ || perl -pe "${@}"
+}
+
+function pearl_escape~ {
+	case "${#}" in
+		0) pearl~ "s/([^\\\\])[\\/]/\$1\\\\\\//gs"        ;;
+		1) pearl~ "s/([^\\\\])[\\${@}]/\$1\\\\\\${@}/gs"  ;;
+		*) echo "Unsupported escapement: ${@}"; exit 1   ;;
+	esac
+}
+
+function pearl_replace~ {
+	case "${#}" in
+		1) pearl~ "s/${@}//gs"                           ;;
+		2) pearl~ "s/${1}/${2}/gs"                       ;;
+		*) echo "Unsupported replacement: ${@}"; exit 1 ;;
+	esac
+}
+
+command="pearl~"
+
+while [[ "${#}" -gt 0 ]]; do
+	case "${1}" in
+		--esc|--escape)                 command="${command} | pearl_escape~"  ;;
+		--rem|--remove|--rep|--replace) command="${command} | pearl_replace~" ;;
+		-*) echo "Unrecognized option: ${1}"; exit 0                             ;;
+		*) command="${command} \"${1}\""
+	esac
+	shift
+done
+
+eval "${command}"

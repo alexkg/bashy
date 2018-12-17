@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+function echo_usage {
+	echo "... | count~       # returns number of lines"
+	echo "... | count~ match # returns number of matches"
+}
+
+function count_lines~ {
+	wc -l
+}
+function change_lines~ {
+	pearl~ --replace "\\n" "\\r" --replace "${@}" "\\n"
+}
+
+help! "${@}" &&
+	echo_usage && exit 0
+
+nope! "${@}" &&
+	count_lines~ && exit 0
+
+change_lines~ "${@}" | count_lines~
